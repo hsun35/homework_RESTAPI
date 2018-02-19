@@ -28,6 +28,7 @@ public class DescriptionFragment extends Fragment {
     int selectedSimpsonIndex;
     String simpsonName;
     String simpsonDescription;
+    String screenMode;
 
     @Nullable
     @Override
@@ -55,13 +56,21 @@ public class DescriptionFragment extends Fragment {
             Log.i("mylog", "bundle");
         }
         selectedSimpsonIndex = bundle.getInt("simpson_index", 0);
+        screenMode = bundle.getString("screen_mode", "phone");
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if (selectedSimpsonIndex < 0) {
+            return;
+        }
         String nm = Simpsons.simpsons.get(selectedSimpsonIndex).getName();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(nm);
+        if (screenMode == "phone") {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(nm);
+        } else if (screenMode == "tablet") {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Simpons Character: " + nm);
+        }
         name.setText(nm);
         description.setText(Simpsons.simpsons.get(selectedSimpsonIndex).getDescription());
         String imageUrl = Simpsons.simpsons.get(selectedSimpsonIndex).getImageUrl();

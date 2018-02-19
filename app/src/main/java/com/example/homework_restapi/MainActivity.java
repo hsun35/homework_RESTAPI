@@ -92,6 +92,9 @@ public class MainActivity extends AppCompatActivity implements SimpsonsFragment.
                             Simpsons.simpsons = mySimpsonsList;
 
                             addSimpsonsFragment();////!
+                            if (findViewById(R.id.activity_main_large) != null) {
+                                addDescriptionFragmentLarge(-1);
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -139,8 +142,26 @@ public class MainActivity extends AppCompatActivity implements SimpsonsFragment.
         Bundle bundle=new Bundle();
         bundle.putInt("simpson_index",person_index);
         descriptionFragment.setArguments(bundle);
+        bundle.putString("screen_mode", "phone");
 
         fragmentTransaction.replace(R.id.fragmentContainer,descriptionFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+    private void addDescriptionFragmentLarge(int person_index){
+        //mActionBarToolbar.setTitle(Simpsons.simpsons.get(person_index).getName());//set toolbar
+        fragmentTransaction=fragmentManager.beginTransaction();
+
+        DescriptionFragment descriptionFragment=new DescriptionFragment();
+
+
+        Bundle bundle=new Bundle();
+        bundle.putInt("simpson_index",person_index);
+        descriptionFragment.setArguments(bundle);
+        descriptionFragment.setArguments(bundle);
+        bundle.putString("screen_mode", "tablet");
+
+        fragmentTransaction.replace(R.id.fragmentContainer2,descriptionFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -157,14 +178,14 @@ public class MainActivity extends AppCompatActivity implements SimpsonsFragment.
         //Toast.makeText(this, "show description", Toast.LENGTH_SHORT).show();
         selectedSimpsonIndex = person_index;
         Toast.makeText(MainActivity.this, "simpson #" + person_index, Toast.LENGTH_SHORT).show();
-        addDescriptionFragment(person_index);
-        /*
+        //addDescriptionFragment(person_index);
+
         if(findViewById(R.id.activity_main_portrait)!= null) {//portrait
-            addCountryDescriptionFragment(country_index);
-        } else if (findViewById(R.id.activity_main_landscape)!=null) {
-            addCountryDescriptionFragment(R.id.fragmentContainer2, country_index);
+            addDescriptionFragment(person_index);
+        } else if (findViewById(R.id.activity_main_large)!=null) {
+            addDescriptionFragmentLarge(person_index);
         }
-*/
+
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

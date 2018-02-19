@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">homework_RESTAPI</string>
     <string name="textview">TextView</string>
+    <string name="character">Character</string>
+    <string name="description">Description</string>
+    <string name="character_description">character description</string>
 
 </resources>
