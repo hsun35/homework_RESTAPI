@@ -1,9 +1,13 @@
 package com.example.homework_restapi;
 
 import android.app.ProgressDialog;
+import android.content.res.Configuration;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,22 +20,37 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.homework_restapi.R;
+import com.example.homework_restapi.adapter.MyAdapter;
 import com.example.homework_restapi.app.AppController;
+import com.example.homework_restapi.model.Simpsons;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements SimpsonsFragment.SendMessage {
     String tag_json_obj = "json_obj_req";
 
     //String url = "https://api.androidhive.info/volley/person_object.json";
     String url = "http://api.duckduckgo.com/?q=simpsons+characters&format=json";
     ProgressDialog pDialog;
+    //List<Simpsons> mySimpsonsList;
+    FragmentManager fragmentManager;
+    FragmentTransaction fragmentTransaction;
+    //Toolbar mActionBarToolbar;
+
+    int selectedSimpsonIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //mActionBarToolbar = findViewById(R.id.toolbar);
+
+        fragmentManager = getSupportFragmentManager();
 
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Loading...");
@@ -50,16 +69,30 @@ public class MainActivity extends AppCompatActivity {
                         pDialog.dismiss();
                         //showMessage("json obj", response.toString());
                         try {
-                            StringBuilder sb = new StringBuilder();
+                            Log.i("mylog", "get response");
+                            //StringBuilder sb = new StringBuilder();
                             JSONArray jsonArray = response.getJSONArray("RelatedTopics");
+                            List<Simpsons> mySimpsonsList = new ArrayList<>();
                             for(int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject character = jsonArray.getJSONObject(i);
                                 String name = character.getString("Text");
+                                String description;
+                                String image = character.getJSONObject("Icon").getString("URL");
+                                //Log.i("mylog", "obj i = " + i);
+                                description = name.substring(name.indexOf("-") + 2);
                                 name = name.substring(0, name.indexOf("-"));
-                                sb.append(name + "\n");
-                                //Log.i("mylog", "Character: " + name);
+                                //sb.append(name + "\n");
+                                Log.i("mylog", "Character: " + name);
+
+                                Simpsons simpson = new Simpsons(name, description, image);
+                                mySimpsonsList.add(simpson);
                             }
-                            showMessage("characters", sb.toString());
+                            //Log.i("mylog", "get json objs");
+                            //showMessage("characters", sb.toString());
+                            Simpsons.simpsons = mySimpsonsList;
+
+                            addSimpsonsFragment();////!
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -85,6 +118,32 @@ public class MainActivity extends AppCompatActivity {
         //RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
         //requestQueue.add(jsonObjReq);
     }
+    private void addSimpsonsFragment(){
+        //mActionBarToolbar.setTitle("Simpson Characters");
+        fragmentTransaction=fragmentManager.beginTransaction();
+
+        SimpsonsFragment simpsonsFragment = new SimpsonsFragment();
+        simpsonsFragment.setSendMessage(MainActivity.this);
+
+        fragmentTransaction.replace(R.id.fragmentContainer, simpsonsFragment);//in CountriesFragment import android.support.v4.app.Fragment;
+        fragmentTransaction.commit();
+        Log.i("mylog", "add list");
+    }
+    private void addDescriptionFragment(int person_index){
+        //mActionBarToolbar.setTitle(Simpsons.simpsons.get(person_index).getName());//set toolbar
+        fragmentTransaction=fragmentManager.beginTransaction();
+
+        DescriptionFragment descriptionFragment=new DescriptionFragment();
+
+
+        Bundle bundle=new Bundle();
+        bundle.putInt("simpson_index",person_index);
+        descriptionFragment.setArguments(bundle);
+
+        fragmentTransaction.replace(R.id.fragmentContainer,descriptionFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
     public void showMessage(String title, String Messager) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
@@ -92,4 +151,33 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage(Messager);
         builder.show();
     }
+
+    @Override
+    public void sendData(int person_index) {
+        //Toast.makeText(this, "show description", Toast.LENGTH_SHORT).show();
+        selectedSimpsonIndex = person_index;
+        Toast.makeText(MainActivity.this, "simpson #" + person_index, Toast.LENGTH_SHORT).show();
+        addDescriptionFragment(person_index);
+        /*
+        if(findViewById(R.id.activity_main_portrait)!= null) {//portrait
+            addCountryDescriptionFragment(country_index);
+        } else if (findViewById(R.id.activity_main_landscape)!=null) {
+            addCountryDescriptionFragment(R.id.fragmentContainer2, country_index);
+        }
+*/
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Log.i("mylog", "landscape");
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Log.i("mylog", "protrait");
+        }
+    }
+/*
+    @Override
+    public void setToolbar() {
+        mActionBarToolbar.setTitle("Simpson Characters");
+    }*/
 }
