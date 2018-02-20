@@ -4,5 +4,7 @@
     <string name="character">Character</string>
     <string name="description">Description</string>
     <string name="character_description">character description</string>
+    <string name="list">LIST</string>
+    <string name="grid">GRID</string>
 
 </resources>

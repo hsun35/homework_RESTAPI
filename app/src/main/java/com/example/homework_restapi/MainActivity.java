@@ -2,6 +2,7 @@ package com.example.homework_restapi;
 
 import android.app.ProgressDialog;
 import android.content.res.Configuration;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -9,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements SimpsonsFragment.
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
     //Toolbar mActionBarToolbar;
-
+    SimpsonsFragment simpsonsFragment;
     int selectedSimpsonIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +129,26 @@ public class MainActivity extends AppCompatActivity implements SimpsonsFragment.
         //mActionBarToolbar.setTitle("Simpson Characters");
         fragmentTransaction=fragmentManager.beginTransaction();
 
-        SimpsonsFragment simpsonsFragment = new SimpsonsFragment();
+        //Bundle bundle=new Bundle();
+        //bundle.putBoolean("grid_mode", false);
+        MyAdapter.isGrid = false;
+
+        simpsonsFragment = new SimpsonsFragment();
+        simpsonsFragment.setSendMessage(MainActivity.this);
+
+        fragmentTransaction.replace(R.id.fragmentContainer, simpsonsFragment);//in CountriesFragment import android.support.v4.app.Fragment;
+        fragmentTransaction.commit();
+        Log.i("mylog", "add list");
+    }
+    private void addSimpsonsFragment(boolean isGrid){
+        //mActionBarToolbar.setTitle("Simpson Characters");
+        fragmentTransaction=fragmentManager.beginTransaction();
+
+        //Bundle bundle=new Bundle();
+        //bundle.putBoolean("grid_mode", false);
+        MyAdapter.isGrid = isGrid;
+
+        simpsonsFragment = new SimpsonsFragment();
         simpsonsFragment.setSendMessage(MainActivity.this);
 
         fragmentTransaction.replace(R.id.fragmentContainer, simpsonsFragment);//in CountriesFragment import android.support.v4.app.Fragment;
@@ -196,7 +219,81 @@ public class MainActivity extends AppCompatActivity implements SimpsonsFragment.
             Log.i("mylog", "protrait");
         }
     }
-/*
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //return super.onCreateOptionsMenu(menu);
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.toggle_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Object f = fragmentManager.findFragmentById(R.id.fragmentContainer);
+        if (f instanceof SimpsonsFragment) {
+            Log.i("mylog", "current frag is list");
+        } else if (f instanceof DescriptionFragment) {
+            Log.i("mylog", "current frag is description");
+        }
+
+
+            switch (item.getItemId()) {
+                case R.id.list:
+                    Toast.makeText(MainActivity.this, "toggle list", Toast.LENGTH_SHORT).show();
+                    if (findViewById(R.id.activity_main_large) == null && (f instanceof SimpsonsFragment)){//at list view, toggle function is for phone
+                        if (MyAdapter.isGrid) {
+                            Log.i("mylog", "Toggle");
+                            addSimpsonsFragment();
+                        }
+                    } else if (findViewById(R.id.activity_main_large) == null && (f instanceof DescriptionFragment)){
+                        //simpsonsFragment.isGrid = false;
+                        if (MyAdapter.isGrid) {
+                            MyAdapter.doToggle = true;
+                        } else {
+                            MyAdapter.doToggle = false;
+                        }
+                        MyAdapter.isGrid = false;
+                        //Log.i("mylog", "grid statues " + simpsonsFragment.isGrid);
+                    }
+                    return true;
+                case R.id.grid:
+                    Toast.makeText(MainActivity.this, "toggle grid", Toast.LENGTH_SHORT).show();
+                    if (findViewById(R.id.activity_main_large) == null && (f instanceof SimpsonsFragment)){
+                        if (!MyAdapter.isGrid) {
+                            Log.i("mylog", "Toggle");
+                            addSimpsonsFragment(true);
+                        }
+                    } else if (findViewById(R.id.activity_main_large) == null && (f instanceof DescriptionFragment)){
+                        //simpsonsFragment.isGrid = true;
+                        if (MyAdapter.isGrid) {
+                            MyAdapter.doToggle = false;
+                        } else {
+                            MyAdapter.doToggle = true;
+                        }
+                        MyAdapter.isGrid = true;
+                        //Log.i("mylog", "grid statues " + simpsonsFragment.isGrid);
+                    }
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+
+    }
+    @Override
+    public void sendToggle() {
+
+        if (MyAdapter.doToggle) {
+            Log.i("mylog", "sendToggle");
+            addSimpsonsFragment(MyAdapter.isGrid);
+        }/*
+        if (MyAdapter.isGrid) {
+            addSimpsonsFragment();
+        } else {
+            addSimpsonsFragment(true);
+        }*/
+    }
+    /*
     @Override
     public void setToolbar() {
         mActionBarToolbar.setTitle("Simpson Characters");

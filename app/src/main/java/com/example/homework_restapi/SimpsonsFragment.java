@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -31,13 +32,16 @@ public class SimpsonsFragment extends android.support.v4.app.Fragment implements
     MyAdapter adapter;
     SendMessage sendMessage;
     RecyclerView.LayoutManager layoutManager;
+    //boolean toogle;
+    //boolean isGrid;
     //Toolbar mActionBarToolbar;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_simpsons,container,false);
-
+        //this.isGrid = MyAdapter.isGrid;
         Log.i("mylog", "on create fragment");
         initList();
 
@@ -46,6 +50,10 @@ public class SimpsonsFragment extends android.support.v4.app.Fragment implements
 
     @Override
     public void onResume() {
+        //if (this.isGrid != MyAdapter.isGrid) {
+        //    sendMessage.sendToggle();
+        //}
+
         super.onResume();
         //mActionBarToolbar = rootView.findViewById(R.id.toolbar);
         //setSupportActionBar(mActionBarToolbar);
@@ -53,6 +61,8 @@ public class SimpsonsFragment extends android.support.v4.app.Fragment implements
         //context.getSupportActionBar().setTitle(countryName);
         //sendMessage.setToolbar();
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Simpsons Characters");
+        Log.i("mylog", "frag resume");
+        //sendMessage.sendToggle();
     }
 
     @Override
@@ -64,9 +74,20 @@ public class SimpsonsFragment extends android.support.v4.app.Fragment implements
 
         context = rootView.getContext();
         recyclerViewSimpsons = rootView.findViewById(R.id.recyclerView);
-        recyclerViewSimpsons.setLayoutManager(new LinearLayoutManager(context));
+        if (MyAdapter.isGrid){
+            recyclerViewSimpsons.setLayoutManager(new GridLayoutManager(context, 2));
+        } else {
+            recyclerViewSimpsons.setLayoutManager(new LinearLayoutManager(context));
+        }
         recyclerViewSimpsons.setHasFixedSize(true);
 
+        //Bundle bundle = getArguments();
+        //if (bundle == null) {
+        //    Log.i("mylog", "bundle null");
+        //} else {
+        //    Log.i("mylog", "bundle");
+        //}
+        //isGrid = bundle.getBoolean("grid_mode", false);
         //DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerViewSimpsons.getContext(),
         //       layoutManager.);
         //recyclerViewSimpsons.addItemDecoration(dividerItemDecoration);
@@ -101,6 +122,7 @@ public class SimpsonsFragment extends android.support.v4.app.Fragment implements
 
         void sendData(int country_index);
         //void setToolbar();
+        void sendToggle();
     }
 
     public void setSendMessage(SendMessage sendMessage){
